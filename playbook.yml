@@ -1,0 +1,54 @@
+---
+- hosts: virtualbox
+  remote_user: ansible
+  vars_files:
+   - vars.yml
+  tasks:
+   - set_fact: pkg_name=httpd
+     when: ansible_os_family == "RedHat"
+   - set_fact: pkg_name=apache2
+     when: ansible_os_family == "Debian"
+   - name: VIM Setup
+     apt: name={{ package_name }} state=latest
+     sudo: yes
+     when: ansible_os_family == "Debian"
+# Shell module test
+   - name: List the files to another file using shell
+     shell: ls -la /var/log > /home/ansible/ansible-file
+     sudo: yes
+     when: ansible_os_family == "Debian"
+# Raw module test
+#   - name: raw  module to install nmap
+#     raw: yum -y install wget 
+#     sudo: yes
+#     when: ansible_os_family == "RedHat"
+   - name: HTTP Server Setup
+     apt: name={{ pkg_name }} state=latest
+     sudo: yes
+     when: ansible_os_family == "Debian"
+# Create a file and give permission
+   - name: Create a file and give permission
+     file: path=/home/ansible/new_ansi_file owner=root group=root mode=0644 state=touch
+     sudo: yes
+     when: ansible_os_family == "Debian"
+   - name: HTTP Server Setup
+     yum: name={{ pkg_name }} state=latest
+     sudo: yes
+     when: ansible_os_family == "RedHat"
+   - name: HTTP Service
+     service: name=apache2 state=started
+     sudo: yes
+     when: ansible_os_family == "Debian"
+# Command module test
+   - name: Create a file
+     command: touch "/home/ansible/ansible-file"
+     args: 
+       creates: "/home/ansible/ansible-file"  # Check is the file is exists, is yes won't create
+     sudo: yes
+     when: ansible_os_family == "RedHat"
+   - name: HTTP Service start
+     service: name={{pkg_name}} state=started
+     sudo: yes
+     when: ansible_os_family == "RedHat"
+   - name: Testing Debug
+     debug: msg={{ansible_distribution}}
