@@ -1,0 +1,7 @@
+---
+- hosts: virtualbox
+  remote_user: ansible
+  gather_facts: False
+  tasks:
+    - name: Debug test for inventory_hostname variable 
+      debug: msg={{inventory_hostname}} # This can used without gathering facts

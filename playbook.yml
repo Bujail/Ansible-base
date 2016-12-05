@@ -1,6 +1,7 @@
 ---
 - hosts: virtualbox
   remote_user: ansible
+  gather_facts: False
   vars_files:
    - vars.yml
   tasks:
@@ -50,5 +51,11 @@
      service: name={{pkg_name}} state=started
      sudo: yes
      when: ansible_os_family == "RedHat"
+#   - name: Testing Debug
+#     debug: msg={{ansible_distribution}}
    - name: Testing Debug
-     debug: msg={{ansible_distribution}}
+     debug: msg={{ inventory_hostname }}
+# Templates testing
+   - name: Create a test template
+     template: src=./jinja-test dest=/home/ansible/jinja-result
+     
